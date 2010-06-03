@@ -8,7 +8,8 @@ class Png2ico <Formula
   depends_on 'libpng'
 
   def install
-    system "make"
-    bin.install('png2ico')
+    system 'make'
+    bin.install 'png2ico'
+    man1.install 'doc/png2ico.1'
   end
 end
