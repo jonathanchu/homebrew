@@ -8,8 +8,9 @@ class Png2ico <Formula
   depends_on 'libpng'
 
   def install
-    # specific to libpng v1.2.43
-    inreplace 'Makefile', 'CPPFLAGS=-W -Wall -O2 -finline-functions', 'CPPFLAGS=-W -Wall -O2 -finline-functions -I/usr/local/Cellar/libpng/1.2.43/include -L/usr/local/Cellar/libpng/1.2.43/lib'
+    # comment out CPPFLAGS so libpng can add -I and -L flags properly
+    inreplace 'Makefile', 'CPPFLAGS=-W -Wall -O2 -finline-functions', '#CPPFLAGS=-W -Wall -O2 -finline-functions'
+    inreplace 'Makefile', '$(CPPFLAGS)', '$(CPPFLAGS) $(LDFLAGS) $(CFLAGS) -W -Wall -O2 -finline-functions'
     system 'make'
     bin.install 'png2ico'
     man1.install 'doc/png2ico.1'
