@@ -46,7 +46,7 @@ didn't include with OS X.
 
     To install a newer version of HEAD use
     `brew rm <foo> && brew install --HEAD <foo>`
-    or `brew --force --HEAD <foo>`.
+    or `brew install --force --HEAD <foo>`.
 
   * `install --interactive [--git]` <formula>:
     Download and patch <formula>, then open a shell. This allows the user to
@@ -206,7 +206,11 @@ didn't include with OS X.
   * `--cellar`:
     Display Homebrew's Cellar path. *Default:* `/usr/local/Cellar`
 
+<<<<<<< HEAD
   * `--cellar`:
+=======
+  * `--cellar` <formula>:
+>>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
     Display the location in the cellar where <formula> would be installed,
     without any sort of versioned folder as the last path.
 
@@ -228,7 +232,11 @@ to recognize `brew cmdname`.
 
 Some sample commands ship with Homebrew and are enabled by default.
 
+<<<<<<< HEAD
     $ ls `brew --repository`/Lirary/Contributes/examples
+=======
+    $ ls `brew --repository`/Library/Contributions/examples
+>>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
 
 
 

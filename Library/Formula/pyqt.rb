@@ -4,9 +4,15 @@ require 'formula'
 # downloads disappear.
 
 class Pyqt <Formula
+<<<<<<< HEAD
   url 'http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-mac-gpl-4.8.1.tar.gz'
   homepage 'http://www.riverbankcomputing.co.uk/software/pyqt'
   md5 '177fa10c6420d6f7fc745478fa64304a'
+=======
+  url 'http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-mac-gpl-4.8.2.tar.gz'
+  homepage 'http://www.riverbankcomputing.co.uk/software/pyqt'
+  md5 'bbb21ddda3d681847e42d20f1c883fbb'
+>>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
 
   depends_on 'sip'
   depends_on 'qt'

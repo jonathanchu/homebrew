@@ -7,8 +7,13 @@ require 'formula'
 
 class Libvirt <Formula
   homepage 'http://www.libvirt.org'
+<<<<<<< HEAD
   url 'http://libvirt.org/sources/libvirt-0.8.6.tar.gz'
   sha256 '99d5f6f6890eaa78887832e218c01c79c410b6e76d8d526980906808e2487220'
+=======
+  url 'http://libvirt.org/sources/libvirt-0.8.7.tar.gz'
+  sha256 'da7b0e8bff7b2df2e19d732272674599bfb805787fb0d6f30289ba700ca77f31'
+>>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
 
   depends_on "gnutls"
 

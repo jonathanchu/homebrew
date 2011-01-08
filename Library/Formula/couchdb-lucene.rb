@@ -1,9 +1,15 @@
 require 'formula'
 
 class CouchdbLucene <Formula
+<<<<<<< HEAD
   url 'https://github.com/rnewson/couchdb-lucene/tarball/v0.5.3'
   homepage 'https://github.com/rnewson/couchdb-lucene'
   md5 '1b9be17eb59b6b2839e50eb222bc7e7e'
+=======
+  url 'https://github.com/rnewson/couchdb-lucene/tarball/v0.6.0'
+  homepage 'https://github.com/rnewson/couchdb-lucene'
+  md5 'b55610d4c054987a5c69183585a31d8b'
+>>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
 
   depends_on 'couchdb'
   depends_on 'maven'

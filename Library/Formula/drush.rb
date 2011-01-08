@@ -7,10 +7,17 @@ class DrushMake <Formula
 end
 
 class Drush <Formula
+<<<<<<< HEAD
   url 'http://ftp.drupal.org/files/projects/drush-6.x-4.0-rc3.tar.gz'
   homepage 'http://drupal.org/project/drush'
   version '4.0-rc3' # Lets be explicit here
   md5 '87659a5b3559f9eb7ef0a16c320a01ad'
+=======
+  url 'http://ftp.drupal.org/files/projects/drush-6.x-4.0-rc7.tar.gz'
+  homepage 'http://drupal.org/project/drush'
+  version '4.0-rc7'
+  md5 '327e09a3fd9eef6c918ea1eac2ceb312'
+>>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
 
   def install
     prefix.install Dir['*'] # No lib folder, so this is OK for now.
