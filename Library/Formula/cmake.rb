@@ -5,6 +5,13 @@ class Cmake <Formula
   md5 'a76a44b93acf5e3badda9de111385921'
   homepage 'http://www.cmake.org/'
 
+  def patches
+    # Adds support for enabling/disabling specific system libraries
+    # http://public.kitware.com/Bug/view.php?id=11431
+    # Shouldn't be needed in 2.8.4
+    "http://cmake.org/gitweb?p=cmake.git;a=patch;h=60d72b56"
+  end
+
   def install
 <<<<<<< HEAD
 =======
@@ -18,6 +25,7 @@ class Cmake <Formula
       EOS
     end
 
+<<<<<<< HEAD
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
     # If we specify to CMake to use the system libraries by passing
     # --system-libs to bootstrap then it insists on finding them all
@@ -29,8 +37,11 @@ class Cmake <Formula
               "# Mention to the user what system libraries are being used.",
               "SET(CMAKE_USE_SYSTEM_LIBARCHIVE 0)"
 
+=======
+>>>>>>> 76f99dad4b457774743d5d06f21e15a4a6949c9e
     system "./bootstrap", "--prefix=#{prefix}",
                           "--system-libs",
+                          "--no-system-libarchive",
                           "--datadir=/share/cmake",
                           "--docdir=/share/doc/cmake",
                           "--mandir=/share/man"
