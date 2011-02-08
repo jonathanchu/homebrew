@@ -5,6 +5,7 @@ require 'formula'
 
 class Pyqt <Formula
 <<<<<<< HEAD
+<<<<<<< HEAD
   url 'http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-mac-gpl-4.8.1.tar.gz'
   homepage 'http://www.riverbankcomputing.co.uk/software/pyqt'
   md5 '177fa10c6420d6f7fc745478fa64304a'
@@ -13,6 +14,11 @@ class Pyqt <Formula
   homepage 'http://www.riverbankcomputing.co.uk/software/pyqt'
   md5 'bbb21ddda3d681847e42d20f1c883fbb'
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
+=======
+  url 'http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-mac-gpl-4.8.3.tar.gz'
+  homepage 'http://www.riverbankcomputing.co.uk/software/pyqt'
+  md5 '14bade8b251660177ccc1a0cbbe33aba'
+>>>>>>> e32ce9fbd6836d8a9776dc7d10726274ac32ebfd
 
   depends_on 'sip'
   depends_on 'qt'
