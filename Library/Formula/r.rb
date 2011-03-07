@@ -2,6 +2,7 @@ require 'formula'
 
 class R <Formula
 <<<<<<< HEAD
+<<<<<<< HEAD
   url 'http://cran.r-project.org/src/base/R-2/R-2.12.0.tar.gz'
   homepage 'http://www.R-project.org/'
   md5 'aa003654d238d70bf5bc7433b8257aac'
@@ -10,6 +11,11 @@ class R <Formula
   homepage 'http://www.R-project.org/'
   md5 '078e8d1179fc9a762e326e6da2725468'
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
+=======
+  url 'http://cran.r-project.org/src/base/R-2/R-2.12.2.tar.gz'
+  homepage 'http://www.R-project.org/'
+  md5 'bc70b51dddab8aa39066710624e55d5e'
+>>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
 
   def install
     unless `/usr/bin/which gfortran`.chomp.size > 0

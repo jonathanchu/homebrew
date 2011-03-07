@@ -2,6 +2,7 @@ require 'formula'
 
 class Node <Formula
 <<<<<<< HEAD
+<<<<<<< HEAD
   url 'http://nodejs.org/dist/node-v0.2.5.tar.gz'
   head 'git://github.com/ry/node.git'
   homepage 'http://nodejs.org/'
@@ -12,6 +13,12 @@ class Node <Formula
   homepage 'http://nodejs.org/'
   md5 'b1c50ceb43bee1b221be210b7bc7a216'
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
+=======
+  url 'http://nodejs.org/dist/node-v0.4.2.tar.gz'
+  head 'git://github.com/joyent/node.git'
+  homepage 'http://nodejs.org/'
+  md5 '9e9e791e125f6a601ebc663dc99c72a8'
+>>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
 
   # Stripping breaks dynamic loading
   skip_clean :all

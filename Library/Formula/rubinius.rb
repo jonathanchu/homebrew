@@ -2,6 +2,7 @@ require 'formula'
 
 class Rubinius < Formula
 <<<<<<< HEAD
+<<<<<<< HEAD
   url 'http://asset.rubini.us/rubinius-1.1.1-20101116.tar.gz'
   version '1.1.1'
   homepage 'http://rubini.us/'
@@ -12,6 +13,12 @@ class Rubinius < Formula
   homepage 'http://rubini.us/'
   md5 '4284c2660f1f648942de35d4fc871f70'
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
+=======
+  url 'http://asset.rubini.us/rubinius-1.2.2-20110222.tar.gz'
+  version '1.2.2'
+  homepage 'http://rubini.us/'
+  sha1 '55a931b3377d5d70426acdb507ad1489aae9d5cc'
+>>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
   head 'git://github.com/evanphx/rubinius.git'
 
   # Do not strip binaries, or else it fails to run.
