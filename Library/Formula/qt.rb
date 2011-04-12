@@ -1,11 +1,12 @@
 require 'formula'
 require 'hardware'
 
-class Qt <Formula
+class Qt < Formula
   url 'http://get.qt.nokia.com/qt/source/qt-everywhere-opensource-src-4.7.2.tar.gz'
   md5 '66b992f5c21145df08c99d21847f4fdb'
   homepage 'http://qt.nokia.com/'
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   def patches
     # To fix http://bugreports.qt.nokia.com/browse/QTBUG-13623. Patch sent upstream.
@@ -18,6 +19,12 @@ class Qt <Formula
 
 =======
 >>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
+=======
+  def patches
+    "http://qt.nokia.com/files/qt-patches/blacklist-fraudulent-comodo-certificates-patch.diff"
+  end
+
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   def options
     [
       ['--with-qtdbus', "Enable QtDBus module."],
@@ -28,23 +35,20 @@ class Qt <Formula
     ]
   end
 
-  def self.x11?
-    File.exist? "/usr/X11R6/lib"
-  end
-
   depends_on "d-bus" if ARGV.include? '--with-qtdbus'
-  depends_on 'libpng' unless x11?
-  depends_on 'sqlite' if MACOS_VERSION <= 10.5
+  depends_on 'sqlite' if MacOS.leopard?
 
   def install
+    ENV.x11
     ENV.append "CXXFLAGS", "-fvisibility=hidden"
     args = ["-prefix", prefix,
             "-system-libpng", "-system-zlib",
+            "-L/usr/X11R6/lib", "-I/usr/X11R6/include",
             "-confirm-license", "-opensource",
             "-cocoa", "-fast" ]
 
     # See: https://github.com/mxcl/homebrew/issues/issue/744
-    args << "-system-sqlite" if MACOS_VERSION <= 10.5
+    args << "-system-sqlite" if MacOS.leopard?
     args << "-plugin-sql-mysql" if (HOMEBREW_CELLAR+"mysql").directory?
 
     if ARGV.include? '--with-qtdbus'
@@ -68,19 +72,11 @@ class Qt <Formula
       args << "-nomake" << "demos" << "-nomake" << "examples"
     end
 
-    if Qt.x11?
-      args << "-L/usr/X11R6/lib"
-      args << "-I/usr/X11R6/include"
-    else
-      args << "-L#{Formula.factory('libpng').lib}"
-      args << "-I#{Formula.factory('libpng').include}"
-    end
-
-    if snow_leopard_64? or ARGV.include? '--universal'
+    if MacOS.prefer_64_bit? or ARGV.include? '--universal'
       args << '-arch' << 'x86_64'
     end
 
-    if !snow_leopard_64? or ARGV.include? '--universal'
+    if !MacOS.prefer_64_bit? or ARGV.include? '--universal'
       args << '-arch' << 'x86'
     end
 

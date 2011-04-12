@@ -1,15 +1,16 @@
 require 'formula'
 
-class DBus <Formula
-  url 'http://dbus.freedesktop.org/releases/dbus/dbus-1.4.1.tar.gz'
+class DBus < Formula
   homepage 'http://www.freedesktop.org/wiki/Software/dbus'
-  md5 '99cb057700c0455fb68f8d57902f77ac'
+  url 'http://dbus.freedesktop.org/releases/dbus/dbus-1.4.8.tar.gz'
+  sha256 '48bf73a35be0f0e2d9a5071d8f2d9c7c40b4254d9b405dee57f0fb07c9c3cf58'
 
   # Don't clean the empty directories that D-Bus needs
   skip_clean "etc/dbus-1/session.d"
   skip_clean "etc/dbus-1/system.d"
   skip_clean "var/run/dbus"
 
+<<<<<<< HEAD
   def patches
 <<<<<<< HEAD
     # Patches merged upstream for launchd support.
@@ -25,6 +26,8 @@ class DBus <Formula
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
   end
 
+=======
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   def install
     # Fix the TMPDIR to one D-Bus doesn't reject due to odd symbols
     ENV["TMPDIR"] = "/tmp"

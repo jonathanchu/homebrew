@@ -3,6 +3,7 @@ require 'formula'
 # Note: this project doesn't save old releases, so it breaks often as
 # downloads disappear.
 
+<<<<<<< HEAD
 class Pyqt <Formula
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -15,6 +16,9 @@ class Pyqt <Formula
   md5 'bbb21ddda3d681847e42d20f1c883fbb'
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
 =======
+=======
+class Pyqt < Formula
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   url 'http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4/PyQt-mac-gpl-4.8.3.tar.gz'
   homepage 'http://www.riverbankcomputing.co.uk/software/pyqt'
   md5 '14bade8b251660177ccc1a0cbbe33aba'

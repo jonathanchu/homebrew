@@ -1,5 +1,6 @@
 require 'formula'
 
+<<<<<<< HEAD
 class Sshuttle <Formula
 <<<<<<< HEAD
   url 'https://github.com/apenwarr/sshuttle/tarball/sshuttle-0.43'
@@ -12,6 +13,13 @@ class Sshuttle <Formula
   md5 'c0d81604a8d864d0f52f2b6137b655a7'
   version '0.44'
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
+=======
+class Sshuttle < Formula
+  url 'https://github.com/apenwarr/sshuttle/zipball/sshuttle-0.52'
+  homepage 'https://github.com/apenwarr/sshuttle'
+  md5 '0f41d963be481d0d136d2b82180d6fcd'
+  version '0.52'
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
 
   head 'git://github.com/apenwarr/sshuttle.git'
 
@@ -19,7 +27,7 @@ class Sshuttle <Formula
     libexec.install Dir['*']
     (bin+'sshuttle').write <<-EOS.undent
       #!/bin/bash
-      exec #{libexec}/main.py "$@"
+      exec #{libexec}/sshuttle "$@"
     EOS
   end
 end

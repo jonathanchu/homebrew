@@ -1,5 +1,6 @@
 require 'formula'
 
+<<<<<<< HEAD
 class Redis <Formula
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -20,12 +21,19 @@ class Redis <Formula
   homepage 'http://redis.io/'
   sha1 '75b953e4a3067570555c5f3f5e8f481c40489904'
 >>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
+=======
+class Redis < Formula
+  url 'http://redis.googlecode.com/files/redis-2.2.4.tar.gz'
+  head 'git://github.com/antirez/redis.git'
+  homepage 'http://redis.io/'
+  sha1 '063e6e9f615ceda664d0691a6ea59befb22ebc40'
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
+
+  fails_with_llvm "Fails with \"reference out of range from _linenoise\""
 
   def install
-    fails_with_llvm "Fails with \"reference out of range from _linenoise\""
-
     # Architecture isn't detected correctly on 32bit Snow Leopard without help
-    ENV["OBJARCH"] = snow_leopard_64? ? "-arch x86_64" : "-arch i386"
+    ENV["OBJARCH"] = MacOS.prefer_64_bit? ? "-arch x86_64" : "-arch i386"
 
     # Head and stable have different code layouts
     src = File.exists?('src/Makefile') ? 'src' : '.'
@@ -36,6 +44,9 @@ class Redis <Formula
     }
 
     %w( run db/redis log ).each { |p| (var+p).mkpath }
+
+    # Set correct directory permissions for database files
+    chmod 0755, "#{var}/db/redis"
 
     # Fix up default conf file to match our paths
     inreplace "redis.conf" do |s|

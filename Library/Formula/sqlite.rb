@@ -1,5 +1,6 @@
 require 'formula'
 
+<<<<<<< HEAD
 class Sqlite <Formula
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -11,6 +12,9 @@ class Sqlite <Formula
   version '3.7.4'
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
 =======
+=======
+class Sqlite < Formula
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   url 'http://www.sqlite.org/sqlite-autoconf-3070500.tar.gz'
   md5 'a9604a82613ade2e7f4c303f233e477f'
   version '3.7.5'

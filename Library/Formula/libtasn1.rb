@@ -1,11 +1,15 @@
 require 'formula'
 
+<<<<<<< HEAD
 class Libtasn1 <Formula
 <<<<<<< HEAD
   url 'http://ftp.gnu.org/gnu/libtasn1/libtasn1-2.8.tar.gz'
   homepage 'http://www.gnu.org/software/libtasn1/'
   md5 '53fd164f8670e55a9964666990fb358f'
 =======
+=======
+class Libtasn1 < Formula
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   url 'http://ftp.gnu.org/gnu/libtasn1/libtasn1-2.9.tar.gz'
   homepage 'http://www.gnu.org/software/libtasn1/'
   md5 'f4f4035b84550100ffeb8ad4b261dea9'

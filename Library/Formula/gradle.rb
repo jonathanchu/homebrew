@@ -1,7 +1,8 @@
 require 'formula'
 
-class Gradle <Formula
+class Gradle < Formula
   homepage 'http://www.gradle.org/'
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -30,6 +31,11 @@ class Gradle <Formula
   url 'http://gradle.artifactoryonline.com/gradle/distributions/gradle-1.0-milestone-1-all.zip'
   md5 '8bea9ef3293e1aff1d26dd2a7e44e08a'
 >>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
+=======
+  version '1.0-milestone-2'
+  url 'http://repo.gradle.org/gradle/distributions/gradle-1.0-milestone-2-all.zip'
+  md5 '7d3184d952e4f8fc2d650c1fe77ff06e'
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
 
   def install
     rm_f Dir["bin/*.bat"]

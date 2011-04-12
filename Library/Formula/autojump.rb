@@ -1,5 +1,6 @@
 require 'formula'
 
+<<<<<<< HEAD
 class Autojump <Formula
 <<<<<<< HEAD
   url 'https://github.com/downloads/joelthelion/autojump/autojump_v13.tar.gz'
@@ -7,6 +8,9 @@ class Autojump <Formula
   md5 '13e4e6173f4ed63b8babb00fcd95f600'
   version '13'
 =======
+=======
+class Autojump < Formula
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   url 'https://github.com/downloads/joelthelion/autojump/autojump_v14.tar.gz'
   homepage 'https://github.com/joelthelion/autojump/wiki'
   md5 '7c0a41a2d33aee11a844dc17f7825dc9'

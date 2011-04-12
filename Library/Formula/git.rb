@@ -4,6 +4,7 @@ class GitManuals < Formula
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.3.4.tar.bz2'
   md5 'ec0883134fa00628d9057d1551d9c739'
 end
@@ -27,14 +28,19 @@ class Git < Formula
   url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.4.1.tar.bz2'
   md5 'ac3e15c568e887af4517a01e16671947'
 >>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
+=======
+  url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.4.4.tar.bz2'
+  md5 '5812f4fca4afc6c81e06f485111ec8ab'
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
 end
 
 class GitHtmldocs < Formula
-  url 'http://kernel.org/pub/software/scm/git/git-htmldocs-1.7.4.1.tar.bz2'
-  md5 'a18f25174fd2734b1d535356f0368890'
+  url 'http://kernel.org/pub/software/scm/git/git-htmldocs-1.7.4.4.tar.bz2'
+  md5 '71e40b22e5d4b54f69ac1e8e0ca1670b'
 end
 
 class Git < Formula
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   url 'http://kernel.org/pub/software/scm/git/git-1.7.3.5.tar.bz2'
@@ -48,6 +54,10 @@ class Git < Formula
   url 'http://kernel.org/pub/software/scm/git/git-1.7.4.1.tar.bz2'
   md5 '76898de4566d11c0d0eec7e99edc2b5c'
 >>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
+=======
+  url 'http://kernel.org/pub/software/scm/git/git-1.7.4.4.tar.bz2'
+  md5 '1313f71d62fa100b32fa313769a85f2a'
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   homepage 'http://git-scm.com'
 
   def install

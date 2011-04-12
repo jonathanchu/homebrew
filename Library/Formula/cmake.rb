@@ -1,6 +1,6 @@
 require 'formula'
 
-class Cmake <Formula
+class Cmake < Formula
   url 'http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz'
   md5 '209b7d1d04b2e00986538d74ba764fcf'
   homepage 'http://www.cmake.org/'
@@ -19,6 +19,7 @@ class Cmake <Formula
     end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
     # If we specify to CMake to use the system libraries by passing
     # --system-libs to bootstrap then it insists on finding them all
@@ -32,6 +33,16 @@ class Cmake <Formula
 
 =======
 >>>>>>> 76f99dad4b457774743d5d06f21e15a4a6949c9e
+=======
+    if ENV['GREP_OPTIONS'] == "--color=always"
+      opoo "GREP_OPTIONS is set to '--color=always'"
+      puts <<-EOS.undent
+        Having `GREP_OPTIONS` set this way causes Cmake builds to fail.
+        You will need to `unset GREP_OPTIONS` before brewing.
+      EOS
+    end
+
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
     system "./bootstrap", "--prefix=#{prefix}",
                           "--system-libs",
                           "--no-system-libarchive",

@@ -1,6 +1,7 @@
 require 'formula'
 require 'hardware'
 
+<<<<<<< HEAD
 class Pypy <Formula
   if snow_leopard_64?
 <<<<<<< HEAD
@@ -13,6 +14,10 @@ class Pypy <Formula
   homepage 'http://pypy.org/'
   version '1.4'
 =======
+=======
+class Pypy < Formula
+  if MacOS.prefer_64_bit?
+>>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
     url 'http://pypy.org/download/pypy-1.4.1-osx64.tar.bz2'
     md5 '769b3fb134944ee8c22ad0834970de3b'
   else
