@@ -1,17 +1,14 @@
 require 'formula'
 
 class Hiredis < Formula
-  url 'https://github.com/antirez/hiredis/tarball/v0.9.2'
-  head 'git://github.com/antirez/hiredis.git'
-  homepage 'https://github.com/antirez/hiredis'
-  version '0.9.2'
-  sha1 '2a258b2bc56958144307df13a5ecf6692c637ee3'
+  homepage 'https://github.com/redis/hiredis'
+  url 'https://github.com/redis/hiredis/tarball/v0.11.0'
+  sha1 '26eb4459943530b4be66fd253c5c8f4dd86c2fa3'
 
   def install
     # Architecture isn't detected correctly on 32bit Snow Leopard without help
     ENV["OBJARCH"] = MacOS.prefer_64_bit? ? "-arch x86_64" : "-arch i386"
 
-    system "make PREFIX=#{prefix}"
-    system "make install PREFIX=#{prefix}"
+    system "make", "install", "PREFIX=#{prefix}"
   end
 end

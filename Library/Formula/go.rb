@@ -1,32 +1,90 @@
 require 'formula'
-require 'hardware'
 
 class Go < Formula
-  if ARGV.include? "--use-git-head"
-    head 'https://github.com/tav/go.git', :tag => 'release'
-  else
-    head 'http://go.googlecode.com/hg/', :revision => 'release'
-  end
   homepage 'http://golang.org'
-
-  def options
-    [["--use-git-head", "Use git mirror instead of official hg repository"]]
-  end
+  url 'http://go.googlecode.com/files/go1.0.3.src.tar.gz'
+  version '1.0.3'
+  sha1 '1a67293c10d6c06c633c078a7ca67e98c8b58471'
+  head 'https://go.googlecode.com/hg/'
 
   skip_clean 'bin'
 
-  def install
-    ENV.j1 # https://github.com/mxcl/homebrew/issues/#issue/237
-    prefix.install %w[src include test doc misc lib favicon.ico]
-    Dir.chdir prefix
-    mkdir %w[pkg bin]
+  option 'cross-compile-all', "Build the cross-compilers and runtime support for all supported platforms"
+  option 'cross-compile-common', "Build the cross-compilers and runtime support for darwin, linux and windows"
 
-    Dir.chdir 'src' do
-      system "./all.bash"
+  if build.head?
+    fails_with :clang do
+      cause "clang: error: no such file or directory: 'libgcc.a'"
+    end
+  end
+
+  def install
+    # install the completion scripts
+    (prefix/'etc/bash_completion.d').install 'misc/bash/go' => 'go-completion.bash'
+    (share/'zsh/site-functions').install 'misc/zsh/go' => '_go'
+
+    if build.include? 'cross-compile-all'
+      targets = [
+        ['linux',   ['386', 'amd64', 'arm'], { :cgo => false }],
+        ['freebsd', ['386', 'amd64'],        { :cgo => false }],
+
+        ['openbsd', ['386', 'amd64'],        { :cgo => false }],
+
+        ['windows', ['386', 'amd64'],        { :cgo => false }],
+
+        # Host platform (darwin/amd64) must always come last
+        ['darwin',  ['386', 'amd64'],        { :cgo => true  }],
+      ]
+    elsif build.include? 'cross-compile-common'
+      targets = [
+        ['linux',   ['386', 'amd64', 'arm'], { :cgo => false }],
+        ['windows', ['386', 'amd64'],        { :cgo => false }],
+
+        # Host platform (darwin/amd64) must always come last
+        ['darwin',  ['386', 'amd64'],        { :cgo => true  }],
+      ]
+    else
+      targets = [
+        ['darwin', [''], { :cgo => true }]
+      ]
     end
 
-    # Keep the makefiles - https://github.com/mxcl/homebrew/issues/issue/1404
-    Dir['src/*'].each{|f| rm_rf f unless f.match(/^src\/(pkg|Make)/) }
-    rm_rf %w[include test]
+    # The version check is due to:
+    # http://codereview.appspot.com/5654068
+    Pathname.new('VERSION').write 'default' if build.head?
+
+    cd 'src' do
+      # Build only. Run `brew test go` to run distrib's tests.
+      targets.each do |(os, archs, opts)|
+      archs.each do |arch|
+        ENV['GOROOT_FINAL'] = prefix
+        ENV['GOOS']         = os
+        ENV['GOARCH']       = arch
+        ENV['CGO_ENABLED']  = opts[:cgo] ? "1" : "0"
+        allow_fail = opts[:allow_fail] ? "|| true" : ""
+        system "./make.bash --no-clean #{allow_fail}"
+      end
+      end
+    end
+
+    # cleanup ENV
+    ENV.delete('GOROOT_FINAL')
+    ENV.delete('GOOS')
+    ENV.delete('GOARCH')
+    ENV.delete('CGO_ENABLED')
+
+    Pathname.new('pkg/obj').rmtree
+
+    # Don't install header files; they aren't necessary and can
+    # cause problems with other builds. See:
+    # http://trac.macports.org/ticket/30203
+    # http://code.google.com/p/go/issues/detail?id=2407
+    prefix.install(Dir['*'] - ['include'])
+  end
+
+  def test
+    cd "#{prefix}/src" do
+      system './run.bash --no-rebuild'
+    end
   end
 end

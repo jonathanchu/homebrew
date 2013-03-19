@@ -1,38 +1,26 @@
 require 'formula'
 
-# This formula provides the libvirt daemon (libvirtd), development libraries, and the
-# virsh command line tool.  This allows people to manage their virtualisation servers
-# remotely, and (as this continues to be developed) manage virtualisation servers
-# running on the local host
-
 class Libvirt < Formula
   homepage 'http://www.libvirt.org'
-<<<<<<< HEAD
-<<<<<<< HEAD
-  url 'http://libvirt.org/sources/libvirt-0.8.6.tar.gz'
-  sha256 '99d5f6f6890eaa78887832e218c01c79c410b6e76d8d526980906808e2487220'
-=======
-  url 'http://libvirt.org/sources/libvirt-0.8.7.tar.gz'
-  sha256 'da7b0e8bff7b2df2e19d732272674599bfb805787fb0d6f30289ba700ca77f31'
->>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
-=======
-  url 'http://libvirt.org/sources/libvirt-0.8.8.tar.gz'
-  sha256 '030aea3728917053555bec98d93d2855e8a603b758c0b2a5d57ac48b4f39e113'
->>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
+  url 'http://libvirt.org/sources/libvirt-1.0.3.tar.gz'
+  sha256 'f64f4acd7cdcfc6ab5e803195ed58b949f262b54e3659d8c37b33f0fec112757'
 
-  depends_on "gnutls"
-  depends_on "yajl"
+  option 'without-libvirtd', 'Build only the virsh client and development libraries'
 
-  if MacOS.leopard?
+  depends_on 'pkg-config' => :build
+  depends_on 'gnutls'
+  depends_on 'libgcrypt'
+  depends_on 'yajl'
+
+  if MacOS.version == :leopard
     # Definitely needed on Leopard, but not on Snow Leopard.
     depends_on "readline"
     depends_on "libxml2"
   end
 
-  fails_with_llvm "Undefined symbols when linking", :build => "2326"
-
-  def options
-    [['--without-libvirtd', 'Build only the virsh client and development libraries.']]
+  fails_with :llvm do
+    build 2326
+    cause "Undefined symbols when linking"
   end
 
   def install
@@ -42,14 +30,14 @@ class Libvirt < Formula
             "--sysconfdir=#{etc}",
             "--with-esx",
             "--with-init-script=none",
-            "--with-openvz",
             "--with-remote",
             "--with-test",
-            "--with-vbox=check",
+            "--with-vbox",
             "--with-vmware",
-            "--with-yajl"]
+            "--with-yajl",
+            "--without-qemu"]
 
-    args << "--without-libvirtd" if ARGV.include? '--without-libvirtd'
+    args << "--without-libvirtd" if build.include? 'without-libvirtd'
 
     system "./configure", *args
 
@@ -60,12 +48,11 @@ class Libvirt < Formula
     # Update the SASL config file with the Homebrew prefix
     inreplace "#{etc}/sasl2/libvirt.conf" do |s|
       s.gsub! "/etc/", "#{HOMEBREW_PREFIX}/etc/"
-      s.gsub! "/var/", "#{HOMEBREW_PREFIX}/var/"
     end
 
     # If the libvirt daemon is built, update its config file to reflect
     # the Homebrew prefix
-    unless ARGV.include? '--without-libvirtd'
+    unless build.include? 'without-libvirtd'
       inreplace "#{etc}/libvirt/libvirtd.conf" do |s|
         s.gsub! "/etc/", "#{HOMEBREW_PREFIX}/etc/"
         s.gsub! "/var/", "#{HOMEBREW_PREFIX}/var/"

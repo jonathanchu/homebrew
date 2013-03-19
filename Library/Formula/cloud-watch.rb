@@ -1,13 +1,10 @@
 require 'formula'
 
-# Require ec2-api-tools to get the base class
-require "#{File.dirname __FILE__}/ec2-api-tools.rb"
-
-class CloudWatch <AmazonWebServicesFormula
-  version  '1.0.9.3'
-  homepage 'http://developer.amazonwebservices.com/connect/entry.jspa?externalID=2534&categoryID=251'
-  url      'http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip'
-  md5      'c07cd65f810f673cdd331f56a2c81dad'
+class CloudWatch < AmazonWebServicesFormula
+  homepage 'http://aws.amazon.com/developertools/2534'
+  url 'http://ec2-downloads.s3.amazonaws.com/CloudWatch-2010-08-01.zip'
+  version '1.0.13.4'
+  sha1 '24f4cbe8554790b7abcc3c037172ab2efecae1af'
 
   def install
     standard_install

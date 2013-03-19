@@ -1,37 +1,27 @@
 require 'formula'
-require 'hardware'
+
+class SixtyFourBitRequired < Requirement
+  fatal true
+
+  satisfy MacOS.prefer_64_bit?
+
+  def message; <<-EOS.undent
+    32-bit MongoDB binaries are no longer available.
+
+    If you need to run a 32-bit version of MongoDB, you can
+    compile the server from source:
+      http://www.mongodb.org/display/DOCS/Building+for+OS+X
+    EOS
+  end
+end
 
 class Mongodb < Formula
   homepage 'http://www.mongodb.org/'
+  url 'http://fastdl.mongodb.org/osx/mongodb-osx-x86_64-2.4.0.tgz'
+  sha1 'def7102b6f8198134beee6ddacee5ea057651ef3'
+  version '2.4.0-x86_64'
 
-  packages = {
-    :x86_64 => {
-      :url => 'http://fastdl.mongodb.org/osx/mongodb-osx-x86_64-1.8.1.tgz',
-      :md5 => 'e446ba61cc8898fa2ffd5046953155ca',
-      :version => '1.8.1-x86_64'
-    },
-    :i386 => {
-      :url => 'http://fastdl.mongodb.org/osx/mongodb-osx-i386-1.8.1.tgz',
-      :md5 => 'db95a601072feb3031f628dd39ca2446',
-      :version => '1.8.1-i386'
-    }
-  }
-
-  package = (Hardware.is_64_bit? and not ARGV.include? '--32bit') ? packages[:x86_64] : packages[:i386]
-
-  url     package[:url]
-  md5     package[:md5]
-  version package[:version]
-
-  skip_clean :all
-
-  def options
-    [
-        ['--32bit', 'Override arch detection and install the 32-bit version.'],
-        ['--nojournal', 'Disable write-ahead logging (Journaling)'],
-        ['--rest', 'Enable the REST Interface on the HTTP Status Page'],
-    ]
-  end
+  depends_on SixtyFourBitRequired
 
   def install
     # Copy the prebuilt binaries to prefix
@@ -41,100 +31,75 @@ class Mongodb < Formula
     (var+'mongodb').mkpath
     (var+'log/mongodb').mkpath
 
-    # Write the configuration files and launchd script
+    # Write the configuration files
     (prefix+'mongod.conf').write mongodb_conf
-    (prefix+'org.mongodb.mongod.plist').write startup_plist
-  end
 
-  def caveats
-    s = ""
-    s += <<-EOS.undent
-    If this is your first install, automatically load on login with:
-        mkdir -p ~/Library/LaunchAgents
-        cp #{prefix}/org.mongodb.mongod.plist ~/Library/LaunchAgents/
-        launchctl load -w ~/Library/LaunchAgents/org.mongodb.mongod.plist
-
-    If this is an upgrade and you already have the org.mongodb.mongod.plist loaded:
-        launchctl unload -w ~/Library/LaunchAgents/org.mongodb.mongod.plist
-        cp #{prefix}/org.mongodb.mongod.plist ~/Library/LaunchAgents/
-        launchctl load -w ~/Library/LaunchAgents/org.mongodb.mongod.plist
-
-    Or start it manually:
-        mongod run --config #{prefix}/mongod.conf
+    # Homebrew: it just works.
+    # NOTE plist updated to use prefix/mongodb!
+    mv bin/'mongod', prefix
+    (bin/'mongod').write <<-EOS.undent
+      #!/usr/bin/env ruby
+      ARGV << '--config' << '#{etc}/mongod.conf' unless ARGV.find { |arg| arg =~ /\-\-config/ }
+      exec "#{prefix}/mongod", *ARGV
     EOS
 
-    if ARGV.include? "--nojournal"
-        s += ""
-        s += <<-EOS.undent
-        Write Ahead logging (Journaling) has been disabled.
-        EOS
-    else
-        s += ""
-        s += <<-EOS.undent
-        MongoDB 1.8+ includes a feature for Write Ahead Logging (Journaling), which has been enabled by default.
-        This is not the default in production (Journaling is disabled); to disable journaling, use --nojournal.
-        EOS
-    end
-
-    return s
+    # copy the config file to etc if this is the first install.
+    etc.install prefix+'mongod.conf' unless File.exists? etc+"mongod.conf"
   end
 
-  def mongodb_conf
-    conf = ""
-    conf += <<-EOS.undent
+  def mongodb_conf; <<-EOS.undent
     # Store data in #{var}/mongodb instead of the default /data/db
     dbpath = #{var}/mongodb
+
+    # Append logs to #{var}/log/mongodb/mongo.log
+    logpath = #{var}/log/mongodb/mongo.log
+    logappend = true
 
     # Only accept local connections
     bind_ip = 127.0.0.1
     EOS
-
-    if !ARGV.include? '--nojournal'
-        conf += <<-EOS.undent
-        # Enable Write Ahead Logging (not enabled by default in production deployments)
-        journal = true
-        EOS
-    end
-
-    if ARGV.include? '--rest'
-        conf += <<-EOS.undent
-        # Enable the REST interface on the HTTP Console (startup port + 1000)
-        rest = true
-        EOS
-    end
-
-    return conf
   end
 
-  def startup_plist
-    return <<-EOS
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>Label</key>
-  <string>org.mongodb.mongod</string>
-  <key>ProgramArguments</key>
-  <array>
-    <string>#{bin}/mongod</string>
-    <string>run</string>
-    <string>--config</string>
-    <string>#{prefix}/mongod.conf</string>
-  </array>
-  <key>RunAtLoad</key>
-  <true/>
-  <key>KeepAlive</key>
-  <false/>
-  <key>UserName</key>
-  <string>#{`whoami`.chomp}</string>
-  <key>WorkingDirectory</key>
-  <string>#{HOMEBREW_PREFIX}</string>
-  <key>StandardErrorPath</key>
-  <string>#{var}/log/mongodb/output.log</string>
-  <key>StandardOutPath</key>
-  <string>#{var}/log/mongodb/output.log</string>
-</dict>
-</plist>
-EOS
+  plist_options :manual => "mongod"
+
+  def plist; <<-EOS.undent
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+    <dict>
+      <key>Label</key>
+      <string>#{plist_name}</string>
+      <key>ProgramArguments</key>
+      <array>
+        <string>#{opt_prefix}/mongod</string>
+        <string>run</string>
+        <string>--config</string>
+        <string>#{etc}/mongod.conf</string>
+      </array>
+      <key>RunAtLoad</key>
+      <true/>
+      <key>KeepAlive</key>
+      <false/>
+      <key>UserName</key>
+      <string>#{`whoami`.chomp}</string>
+      <key>WorkingDirectory</key>
+      <string>#{HOMEBREW_PREFIX}</string>
+      <key>StandardErrorPath</key>
+      <string>#{var}/log/mongodb/output.log</string>
+      <key>StandardOutPath</key>
+      <string>#{var}/log/mongodb/output.log</string>
+      <key>HardResourceLimits</key>
+      <dict>
+        <key>NumberOfFiles</key>
+        <integer>1024</integer>
+      </dict>
+      <key>SoftResourceLimits</key>
+      <dict>
+        <key>NumberOfFiles</key>
+        <integer>1024</integer>
+      </dict>
+    </dict>
+    </plist>
+    EOS
   end
 end

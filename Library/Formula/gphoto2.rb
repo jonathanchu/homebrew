@@ -1,9 +1,9 @@
 require 'formula'
 
 class Gphoto2 < Formula
-  url 'http://downloads.sourceforge.net/project/gphoto/gphoto/2.4.10/gphoto2-2.4.10.tar.bz2'
   homepage 'http://gphoto.org/'
-  md5 '3c86c9824b9bfc57a52be5f84ad205f7'
+  url 'http://downloads.sourceforge.net/project/gphoto/gphoto/2.5.1/gphoto2-2.5.1.tar.bz2'
+  sha1 'c363adfb5d0f21c03bc5dc27daf19e9e409832ec'
 
   depends_on 'pkg-config' => :build
   depends_on 'jpeg'
@@ -13,8 +13,7 @@ class Gphoto2 < Formula
 
   def install
     system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--without-aalib"
+                          "--prefix=#{prefix}"
     system "make install"
   end
 end

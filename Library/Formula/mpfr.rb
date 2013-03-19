@@ -1,31 +1,41 @@
 require 'formula'
 
 class Mpfr < Formula
-  url 'http://www.mpfr.org/mpfr-3.0.1/mpfr-3.0.1.tar.bz2'
   homepage 'http://www.mpfr.org/'
-  md5 'bfbecb2eacb6d48432ead5cfc3f7390a'
+  # Upstream is down a lot, so use the GNU mirror + Gist for patches
+  url 'http://ftpmirror.gnu.org/mpfr/mpfr-3.1.1.tar.bz2'
+  mirror 'http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.1.tar.bz2'
+  version '3.1.1-p2'
+  sha1 'f632d43943ff9f13c184fa13b9a6e8c7f420f4dd'
 
   depends_on 'gmp'
 
-  def options
-    [["--32-bit", "Force 32-bit."]]
-  end
+  option '32-bit'
+
+  # Segfaults under superenv with clang 4.1/421. See:
+  # https://github.com/mxcl/homebrew/issues/15061
+  env :std
 
   def patches
-    {:p1 => ['http://www.mpfr.org/mpfr-3.0.1/allpatches']}
+    "https://gist.github.com/raw/4472199/42c0b207037a133527083d12adc9028b4da429ee/gistfile1.txt"
   end
 
   def install
-    args = []
+    args = ["--disable-dependency-tracking", "--prefix=#{prefix}"]
 
-    if Hardware.is_32_bit? or ARGV.include? "--32-bit"
-      ENV.m32
-      args << "--host=none-apple-darwin"
-    else
+    # Build 32-bit where appropriate, and help configure find 64-bit CPUs
+    # Note: This logic should match what the GMP formula does.
+    if MacOS.prefer_64_bit? and not build.build_32_bit?
       ENV.m64
+      args << "--build=x86_64-apple-darwin"
+    else
+      ENV.m32
+      args << "--build=none-apple-darwin"
     end
 
-    system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}", *args
+    system "./configure", *args
+    system "make"
+    system "make check"
     system "make install"
   end
 end

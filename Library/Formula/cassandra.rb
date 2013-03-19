@@ -1,9 +1,9 @@
 require 'formula'
 
 class Cassandra < Formula
-  url 'http://www.mirrorservice.org/sites/ftp.apache.org//cassandra/0.7.4/apache-cassandra-0.7.4-bin.tar.gz'
   homepage 'http://cassandra.apache.org'
-  md5 'ee0d7ac9b73dedb0a5dca1c34499c2d5'
+  url 'http://www.apache.org/dyn/closer.cgi?path=/cassandra/1.2.2/apache-cassandra-1.2.2-bin.tar.gz'
+  sha1 '3caabe51cbf3165ce0a20a668da40cb0a56b789b'
 
   def install
     (var+"lib/cassandra").mkpath
@@ -12,6 +12,7 @@ class Cassandra < Formula
 
     inreplace "conf/cassandra.yaml", "/var/lib/cassandra", "#{var}/lib/cassandra"
     inreplace "conf/log4j-server.properties", "/var/log/cassandra", "#{var}/log/cassandra"
+    inreplace "conf/cassandra-env.sh", "/lib/", "/"
 
     inreplace "bin/cassandra.in.sh" do |s|
       s.gsub! "CASSANDRA_HOME=`dirname $0`/..", "CASSANDRA_HOME=#{prefix}"
@@ -24,7 +25,43 @@ class Cassandra < Formula
     rm Dir["bin/*.bat"]
 
     (etc+"cassandra").install Dir["conf/*"]
-    prefix.install Dir["*.txt"] + Dir["{bin,interface,javadoc}"]
+    prefix.install Dir["*.txt"] + Dir["{bin,interface,javadoc,pylib,lib/licenses}"]
     prefix.install Dir["lib/*.jar"]
+  end
+
+  def caveats; <<-EOS.undent
+    If you plan to use the CQL shell (cqlsh), you will need the Python CQL library
+    installed. Since Homebrew prefers using pip for Python packages, you can
+    install that using:
+
+      pip install cql
+    EOS
+  end
+
+  def plist; <<-EOS.undent
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+      <dict>
+        <key>KeepAlive</key>
+        <true/>
+
+        <key>Label</key>
+        <string>#{plist_name}</string>
+
+        <key>ProgramArguments</key>
+        <array>
+            <string>#{opt_prefix}/bin/cassandra</string>
+            <string>-f</string>
+        </array>
+
+        <key>RunAtLoad</key>
+        <true/>
+
+        <key>WorkingDirectory</key>
+        <string>#{var}/lib/cassandra</string>
+      </dict>
+    </plist>
+    EOS
   end
 end

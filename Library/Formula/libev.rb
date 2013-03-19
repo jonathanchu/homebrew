@@ -1,15 +1,17 @@
 require 'formula'
 
 class Libev < Formula
-  url 'http://dist.schmorp.de/libev/Attic/libev-4.03.tar.gz'
   homepage 'http://software.schmorp.de/pkg/libev.html'
-  md5 '86cd5c1b42fced1bd02c6e0119e9b865'
+  url 'http://dist.schmorp.de/libev/Attic/libev-4.11.tar.gz'
+  sha1 'e7752a518742c0f8086a8005aa7efcc4dcf02ed9'
 
   def install
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
-                          "--mandir=#{man}",
-                          "--enable-shared"
+                          "--mandir=#{man}"
     system "make install"
+
+    # Remove compatibility header to prevent conflict with libevent
+    (include/"event.h").unlink
   end
 end

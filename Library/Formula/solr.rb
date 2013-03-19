@@ -1,16 +1,16 @@
 require 'formula'
 
 class Solr < Formula
-  url 'ftp://ftp.fu-berlin.de/unix/www/apache/lucene/solr/3.1.0/apache-solr-3.1.0.tgz'
   homepage 'http://lucene.apache.org/solr/'
-  md5 'd7009df28f28a3e616def8035be06790'
+  url 'http://www.apache.org/dyn/closer.cgi?path=lucene/solr/4.2.0/solr-4.2.0.tgz'
+  sha1 '3525a424be3c7f5de27ea1ab60b267cc0670b6c4'
 
   def script; <<-EOS.undent
     #!/bin/sh
     if [ -z "$1" ]; then
       echo "Usage: $ solr path/to/config/dir"
     else
-      cd #{libexec}/example && java -Dsolr.solr.home=$1 -jar start.jar
+      cd #{libexec}/example && java -server $JAVA_OPTS -Dsolr.solr.home=$1 -jar start.jar
     fi
     EOS
   end
@@ -22,10 +22,10 @@ class Solr < Formula
 
   def caveats; <<-EOS.undent
     To start solr:
-        solr path/to/solr/config/dir
+      solr path/to/solr/config/dir
 
     See the solr homepage for more setup information:
-        brew home solr
+      brew home solr
     EOS
   end
 end

@@ -1,10 +1,9 @@
 require 'formula'
 
 class Daemonize < Formula
-  url 'https://github.com/bmc/daemonize/tarball/release-1.6.1'
   homepage 'http://software.clapper.org/daemonize/'
-  md5 'bee4b67382f9969cae72b06038a4ae8e'
-  version '1.6.1'
+  url 'https://github.com/bmc/daemonize/tarball/release-1.7.4'
+  sha1 'b8d151773b9245f5c9e58d9ab8e9ddd665a6b668'
 
   def install
     system "./configure", "--disable-debug", "--disable-dependency-tracking",

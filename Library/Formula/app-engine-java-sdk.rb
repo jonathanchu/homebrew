@@ -1,24 +1,13 @@
 require 'formula'
 
 class AppEngineJavaSdk < Formula
-  url 'http://googleappengine.googlecode.com/files/appengine-java-sdk-1.4.2.zip'
-  homepage 'http://code.google.com/appengine/docs/java/overview.html'
-  sha1 '915808a17c88c4afc159a66299ba06c68eb681b5'
-
-  def shim_script target
-    <<-EOS.undent
-      #!/bin/bash
-      #{libexec}/bin/#{target} $*
-    EOS
-  end
+  homepage 'https://developers.google.com/appengine/docs/java/overview'
+  url 'http://googleappengine.googlecode.com/files/appengine-java-sdk-1.7.5.zip'
+  sha1 '2475c8a50cbe1289e60441f6f011626b9fdc06d0'
 
   def install
     rm Dir['bin/*.cmd']
     libexec.install Dir['*']
-
-    Dir["#{libexec}/bin/*"].each do |b|
-      n = Pathname.new(b).basename
-      (bin+n).write shim_script(n)
-    end
+    bin.write_exec_script "#{libexec}/bin/*"
   end
 end

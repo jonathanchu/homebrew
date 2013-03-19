@@ -1,23 +1,29 @@
 require 'formula'
 
 class Sleuthkit < Formula
-  head 'http://svn.sleuthkit.org/repos/sleuthkit/trunk', :using => :svn
-  url 'http://downloads.sourceforge.net/project/sleuthkit/sleuthkit/3.2.1/sleuthkit-3.2.1.tar.gz'
   homepage 'http://www.sleuthkit.org/'
-  md5 'd873361cb5ef29f02c7107f9aec39b4f'
+  url 'http://downloads.sourceforge.net/project/sleuthkit/sleuthkit/4.0.2/sleuthkit-4.0.2.tar.gz'
+  sha1 'e5394d53eb07615e6e78ff7fa73340cc6f6e98d4'
+
+  head 'https://github.com/sleuthkit/sleuthkit.git'
+
+  if build.head?
+    depends_on :autoconf
+    depends_on :automake
+    depends_on :libtool
+  end
 
   depends_on 'afflib' => :optional
   depends_on 'libewf' => :optional
 
+  conflicts_with 'ffind',
+    :because => "both install a 'ffind' executable."
+
   def install
-    if ARGV.build_head?
-      system "glibtoolize"
-      system "aclocal"
-      system "automake", "--add-missing", "--copy"
-      system "autoconf"
-    end
+    system "./bootstrap" if build.head?
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
+    system "make"
     system "make install"
   end
 end

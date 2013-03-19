@@ -1,20 +1,23 @@
 require 'formula'
 
 class Aalib < Formula
-  url 'http://downloads.sourceforge.net/aa-project/aalib-1.4rc4.tar.gz'
   homepage 'http://aa-project.sourceforge.net/aalib/'
-  md5 'd5aa8e9eae07b7441298b5c30490f6a6'
+  url 'http://downloads.sourceforge.net/aa-project/aalib-1.4rc4.tar.gz'
+  sha1 'a11c16b258bf9b64b135858afabc7f3a45222a4a'
 
-  def patches
-    DATA
-  end
+  # Fix malloc/stdlib issue on OS X
+  # Fix underquoted definition of AM_PATH_AALIB in aalib.m4
+  def patches; DATA end
 
   def install
     ENV.ncurses_define
-    system 'autoreconf --force --install'
-    system "./configure", "--disable-debug", "--disable-dependency-tracking",
-                          "--mandir=#{man}", "--infodir=#{info}",
-                          "--prefix=#{prefix}", "--enable-shared=yes", "--enable-static=yes"
+    system "./configure", "--disable-debug",
+                          "--disable-dependency-tracking",
+                          "--prefix=#{prefix}",
+                          "--mandir=#{man}",
+                          "--infodir=#{info}",
+                          "--enable-shared=yes",
+                          "--enable-static=yes"
     system "make install"
   end
 end
@@ -123,4 +126,16 @@ index 9935b03..7e725ad 100644
  #include <stdlib.h>
  #include <string.h>
  #include <stdio.h>
-
+diff --git a/aalib.m4 b/aalib.m4
+index c40b8db..991fbda 100644
+--- a/aalib.m4
++++ b/aalib.m4
+@@ -9,7 +9,7 @@
+ dnl AM_PATH_AALIB([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
+ dnl Test for AALIB, and define AALIB_CFLAGS and AALIB_LIBS
+ dnl
+-AC_DEFUN(AM_PATH_AALIB,
++AC_DEFUN([AM_PATH_AALIB],
+ [dnl 
+ dnl Get the cflags and libraries from the aalib-config script
+ dnl

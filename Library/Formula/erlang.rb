@@ -1,53 +1,62 @@
 require 'formula'
 
 class ErlangManuals < Formula
-  url 'http://erlang.org/download/otp_doc_man_R14B02.tar.gz'
-  md5 'fc1c925e1195b6f851b1984da9ca0f6f'
+  url 'http://erlang.org/download/otp_doc_man_R16B.tar.gz'
+  sha1 '48eaf215e5dcae8b4f02cc39ed557ec6f9dd026a'
 end
 
 class ErlangHtmls < Formula
-  url 'http://erlang.org/download/otp_doc_html_R14B02.tar.gz'
-  md5 'e1b609c699a2d8fdbbe242a2e3b7efcd'
+  url 'http://erlang.org/download/otp_doc_html_R16B.tar.gz'
+  sha1 '14729a486f331678d2c7ae1ca1608b7e9f3fd8f2'
 end
 
 class ErlangHeadManuals < Formula
-  url 'http://erlang.org/download/otp_doc_man_R14B02.tar.gz'
-  md5 'fc1c925e1195b6f851b1984da9ca0f6f'
+  url 'http://erlang.org/download/otp_doc_man_R16B.tar.gz'
+  sha1 '48eaf215e5dcae8b4f02cc39ed557ec6f9dd026a'
 end
 
 class ErlangHeadHtmls < Formula
-  url 'http://erlang.org/download/otp_doc_html_R14B02.tar.gz'
-  md5 'e1b609c699a2d8fdbbe242a2e3b7efcd'
+  url 'http://erlang.org/download/otp_doc_html_R16B.tar.gz'
+  sha1 '14729a486f331678d2c7ae1ca1608b7e9f3fd8f2'
 end
 
 class Erlang < Formula
-  # Download from GitHub. Much faster than official tarball.
-  url "git://github.com/erlang/otp.git", :tag => "OTP_R14B02"
-  version 'R14B02'
   homepage 'http://www.erlang.org'
+  # Download tarball from GitHub; it is served faster than the official tarball.
+  url 'https://github.com/erlang/otp/archive/OTP_R16B.tar.gz'
+  sha1 '546e8538aa17b8b9212c6cd2ba6781c553c623a5'
 
-  head "git://github.com/erlang/otp.git", :branch => "dev"
+  head 'https://github.com/erlang/otp.git', :branch => 'dev'
 
-  # We can't strip the beam executables or any plugins, there isn't really
-  # anything else worth stripping and it takes a really, long time to run
-  # `file` over everything in lib because there is almost 4000 files (and
-  # really erlang guys! what's with that?! Most of them should be in share/erlang!)
-  # may as well skip bin too, everything is just shell scripts
-  skip_clean ['lib', 'bin']
-
-  def options
-    [
-      ['--disable-hipe', "Disable building hipe; fails on various OS X systems."],
-      ['--time', '"brew test --time" to include a time-consuming test.']
-    ]
+  bottle do
+    sha1 '69f32b53b5b0d1abab749e1316e35cc65e99edaf' => :mountain_lion
+    sha1 'e36c1ac452ff9b2e476bb620296db9182f814efa' => :lion
+    sha1 '37db8ac8b1bedcb820a24773fb31de6e1c967874' => :snow_leopard
   end
 
-  fails_with_llvm "See https://github.com/mxcl/homebrew/issues/issue/120", :build => 2326
+  # remove the autoreconf if possible
+  depends_on :automake
+  depends_on :libtool
+
+  fails_with :llvm do
+    build 2334
+  end
+
+  option 'disable-hipe', "Disable building hipe; fails on various OS X systems"
+  option 'halfword', 'Enable halfword emulator (64-bit builds only)'
+  option 'time', '`brew test --time` to include a time-consuming test'
+  option 'no-docs', 'Do not install documentation'
 
   def install
-    ENV.deparallelize
+    ohai "Compilation takes a long time; use `brew install -v erlang` to see progress" unless ARGV.verbose?
 
-    # If building from GitHub, this step is required (but not for tarball downloads.)
+    if ENV.compiler == :llvm
+      # Don't use optimizations. Fixes build on Lion/Xcode 4.2
+      ENV.remove_from_cflags /-O./
+      ENV.append_to_cflags '-O0'
+    end
+
+    # Do this if building from a checkout to generate configure
     system "./otp_build autoconf" if File.exist? "otp_build"
 
     args = ["--disable-debug",
@@ -55,36 +64,44 @@ class Erlang < Formula
             "--enable-kernel-poll",
             "--enable-threads",
             "--enable-dynamic-ssl-lib",
+            "--enable-shared-zlib",
             "--enable-smp-support"]
 
-    unless ARGV.include? '--disable-hipe'
+    args << "--with-dynamic-trace=dtrace" unless MacOS.version == :leopard or not MacOS::CLT.installed?
+
+    unless build.include? 'disable-hipe'
       # HIPE doesn't strike me as that reliable on OS X
       # http://syntatic.wordpress.com/2008/06/12/macports-erlang-bus-error-due-to-mac-os-x-1053-update/
       # http://www.erlang.org/pipermail/erlang-patches/2008-September/000293.html
       args << '--enable-hipe'
     end
 
-    args << "--enable-darwin-64bit" if MacOS.prefer_64_bit?
+    if MacOS.prefer_64_bit?
+      args << "--enable-darwin-64bit"
+      args << "--enable-halfword-emulator" if build.include? 'halfword' # Does not work with HIPE yet. Added for testing only
+    end
 
     system "./configure", *args
-    system "touch lib/wx/SKIP" if MacOS.snow_leopard?
     system "make"
+    ENV.j1
     system "make install"
 
-    manuals = ARGV.build_head? ? ErlangHeadManuals : ErlangManuals
-    manuals.new.brew { man.install Dir['man/*'] }
+    unless build.include? 'no-docs'
+      manuals = build.head? ? ErlangHeadManuals : ErlangManuals
+      manuals.new.brew { man.install Dir['man/*'] }
 
-    htmls = ARGV.build_head? ? ErlangHeadHtmls : ErlangHtmls
-    htmls.new.brew { doc.install Dir['*'] }
+      htmls = build.head? ? ErlangHeadHtmls : ErlangHtmls
+      htmls.new.brew { doc.install Dir['*'] }
+    end
   end
 
   def test
-    `erl -noshell -eval 'crypto:start().' -s init stop`
+    `#{bin}/erl -noshell -eval 'crypto:start().' -s init stop`
 
     # This test takes some time to run, but per bug #120 should finish in
     # "less than 20 minutes". It takes a few minutes on a Mac Pro (2009).
-    if ARGV.include? "--time"
-      `dialyzer --build_plt -r #{lib}/erlang/lib/kernel-2.14.1/ebin/`
+    if build.include? "time"
+      `#{bin}/dialyzer --build_plt -r #{lib}/erlang/lib/kernel-2.15/ebin/`
     end
   end
 end

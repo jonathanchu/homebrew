@@ -1,61 +1,49 @@
 require 'formula'
 
 class PopplerData < Formula
-  url 'http://poppler.freedesktop.org/poppler-data-0.4.4.tar.gz'
-  md5 'f3a1afa9218386b50ffd262c00b35b31'
+  url 'http://poppler.freedesktop.org/poppler-data-0.4.6.tar.gz'
+  sha1 'f030563eed9f93912b1a546e6d87936d07d7f27d'
 end
 
 class Poppler < Formula
-  url 'http://poppler.freedesktop.org/poppler-0.16.3.tar.gz'
-  homepage 'http://poppler.freedesktop.org/'
-  md5 '42227f1a1498089213a07533596b22f4'
+  homepage 'http://poppler.freedesktop.org'
+  url 'http://poppler.freedesktop.org/poppler-0.22.0.tar.gz'
+  sha1 'd9cfc390a5aa2aaf976318d9bf3642336f625981'
+
+  option 'with-qt4', 'Build Qt backend'
+  option 'with-glib', 'Build Glib backend'
 
   depends_on 'pkg-config' => :build
-  depends_on "qt" if ARGV.include? "--with-qt4"
 
-  def patches
-    DATA
-  end
+  depends_on :fontconfig
+  depends_on 'openjpeg'
 
-  def options
-    [
-      ["--with-qt4", "Include Qt4 support (which compiles all of Qt4!)"],
-      ["--enable-xpdf-headers", "Also install XPDF headers."]
-    ]
-  end
+  depends_on 'qt' if build.include? 'with-qt4'
+  depends_on 'glib' if build.include? 'with-glib'
+  depends_on 'cairo' if build.include? 'with-glib' # Needs a newer Cairo build than OS X 10.6.7 provides
 
   def install
-    if ARGV.include? "--with-qt4"
-      qt4Flags = `pkg-config QtCore --libs` + `pkg-config QtGui --libs`
-      qt4Flags.gsub!("\n","")
-      ENV['POPPLER_QT4_CFLAGS'] = qt4Flags
+    if build.include? 'with-qt4'
+      ENV['POPPLER_QT4_CFLAGS'] = `#{HOMEBREW_PREFIX}/bin/pkg-config QtCore QtGui --libs`.chomp
+      ENV.append 'LDFLAGS', "-Wl,-F#{HOMEBREW_PREFIX}/lib"
     end
 
-    args = ["--disable-dependency-tracking", "--prefix=#{prefix}"]
-    args << "--disable-poppler-qt4" unless ARGV.include? "--with-qt4"
-    args << "--enable-xpdf-headers" if ARGV.include? "--enable-xpdf-headers"
+    args = ["--disable-dependency-tracking", "--prefix=#{prefix}", "--enable-xpdf-headers"]
+    # Explicitly disable Qt if not requested because `POPPLER_QT4_CFLAGS` won't
+    # be set and the build will fail.
+    #
+    # Also, explicitly disable Glib as Poppler will find it and set up to
+    # build, but Superenv will have stripped the Glib utilities out of the
+    # PATH.
+    args << ( build.include?('with-qt4') ? '--enable-poppler-qt4' : '--disable-poppler-qt4' )
+    args << ( build.include?('with-glib') ? '--enable-poppler-glib' : '--disable-poppler-glib' )
 
     system "./configure", *args
     system "make install"
 
     # Install poppler font data.
     PopplerData.new.brew do
-      system "make install prefix=#{prefix}"
+      system "make", "install", "prefix=#{prefix}"
     end
   end
 end
-
-# fix location of fontconfig, http://www.mail-archive.com/poppler@lists.freedesktop.org/msg03837.html
-__END__
---- a/cpp/Makefile.in	2010-07-08 20:57:56.000000000 +0200
-+++ b/cpp/Makefile.in	2010-08-06 11:11:27.000000000 +0200
-@@ -375,7 +375,8 @@
- INCLUDES = \
- 	-I$(top_srcdir)				\
- 	-I$(top_srcdir)/goo			\
--	-I$(top_srcdir)/poppler
-+	-I$(top_srcdir)/poppler \
-+	$(FONTCONFIG_CFLAGS)
- 
- SUBDIRS = . tests
- poppler_includedir = $(includedir)/poppler/cpp

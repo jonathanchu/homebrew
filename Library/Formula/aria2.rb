@@ -1,15 +1,22 @@
 require 'formula'
 
 class Aria2 < Formula
-  url 'http://downloads.sourceforge.net/project/aria2/stable/aria2-1.10.9/aria2-1.10.9.tar.bz2'
-  md5 '856cd88e75c7b893b42f4b6b8f2c0ad1'
   homepage 'http://aria2.sourceforge.net/'
+  url 'http://downloads.sourceforge.net/project/aria2/stable/aria2-1.16.3/aria2-1.16.3.tar.bz2'
+  sha1 'b167ebe325d05a5acd37dcc59300c4f46bfdd42d'
 
-  fails_with_llvm "1.8.2 didn't work w/ LLVM"
+  depends_on 'pkg-config' => :build
+  depends_on 'gnutls'
+  depends_on 'curl-ca-bundle' => :recommended
+
+  # Leopard's libxml2 is too old.
+  depends_on 'libxml2' if MacOS.version == :leopard
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    args = %W[--disable-dependency-tracking --prefix=#{prefix}]
+    args << "--with-ca-bundle=#{HOMEBREW_PREFIX}/share/ca-bundle.crt" if build.with? 'curl-ca-bundle'
+
+    system "./configure", *args
     system "make install"
   end
 end

@@ -1,19 +1,21 @@
 require 'formula'
 
-# Finch is a command-line-only IM client from Pidgin
 class Finch < Formula
-  url 'http://sourceforge.net/projects/pidgin/files/Pidgin/2.7.10/pidgin-2.7.10.tar.bz2'
   homepage 'http://developer.pidgin.im/wiki/Using%20Finch'
-  md5 '7514a5e25cc0061e7e1b7a1928c99247'
+  url 'http://sourceforge.net/projects/pidgin/files/Pidgin/2.10.6/pidgin-2.10.6.tar.bz2'
+  sha1 'a0532e7ba2acd205d6a5a4e3624156a980fe3d43'
 
   depends_on 'pkg-config' => :build
+  depends_on 'intltool' => :build
   depends_on 'libidn'
   depends_on 'gettext'
   depends_on 'glib'
-  depends_on 'intltool'
   depends_on 'gnutls'
-  # configure picked up this dep on my machine - adamv
-  # depends_on 'berkeley-db' => :optional
+  # guntls used to use libgcrypt, and the configure script links this
+  # library when testing for gnutls, so include it as a build-time
+  # dependency. See:
+  # https://github.com/mxcl/homebrew/issues/17129
+  depends_on 'libgcrypt' => :build
 
   def install
     # To get it to compile, had to configure without support for:

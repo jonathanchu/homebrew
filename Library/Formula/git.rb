@@ -1,116 +1,99 @@
 require 'formula'
 
 class GitManuals < Formula
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.3.4.tar.bz2'
-  md5 'ec0883134fa00628d9057d1551d9c739'
+  url 'http://git-core.googlecode.com/files/git-manpages-1.8.2.tar.gz'
+  sha1 'a10083a2a1fe6b35919fd6765f25dec18f4fa752'
 end
 
 class GitHtmldocs < Formula
-  url 'http://kernel.org/pub/software/scm/git/git-htmldocs-1.7.3.4.tar.bz2'
-  md5 '2adbb534b28be52145ddd9bb5cca2f93'
+  url 'http://git-core.googlecode.com/files/git-htmldocs-1.8.2.tar.gz'
+  sha1 'db1ca968f492f7ad1d4e0c13d07f23c745d10b74'
 end
 
 class Git < Formula
-  url 'http://kernel.org/pub/software/scm/git/git-1.7.3.4.tar.bz2'
-  md5 '3a2602016f98c529cda7b9fad1a6e216'
-=======
-  url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.3.5.tar.bz2'
-  md5 '75d9db900fbbde05cdd6d30da6e4f1f5'
-=======
-  url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.4.tar.bz2'
-  md5 'd13d42846a72335eb287e55bc980dc09'
->>>>>>> e32ce9fbd6836d8a9776dc7d10726274ac32ebfd
-=======
-  url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.4.1.tar.bz2'
-  md5 'ac3e15c568e887af4517a01e16671947'
->>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
-=======
-  url 'http://kernel.org/pub/software/scm/git/git-manpages-1.7.4.4.tar.bz2'
-  md5 '5812f4fca4afc6c81e06f485111ec8ab'
->>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
-end
-
-class GitHtmldocs < Formula
-  url 'http://kernel.org/pub/software/scm/git/git-htmldocs-1.7.4.4.tar.bz2'
-  md5 '71e40b22e5d4b54f69ac1e8e0ca1670b'
-end
-
-class Git < Formula
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-  url 'http://kernel.org/pub/software/scm/git/git-1.7.3.5.tar.bz2'
-  md5 '8a8cd93b8a4dff0a03c0fdc77253af3e'
->>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
-=======
-  url 'http://kernel.org/pub/software/scm/git/git-1.7.4.tar.bz2'
-  md5 'fa24dc1ef0b663327ea0fe1981365b39'
->>>>>>> e32ce9fbd6836d8a9776dc7d10726274ac32ebfd
-=======
-  url 'http://kernel.org/pub/software/scm/git/git-1.7.4.1.tar.bz2'
-  md5 '76898de4566d11c0d0eec7e99edc2b5c'
->>>>>>> 449451b63fa3dd406987ddb2737797d4e50dda29
-=======
-  url 'http://kernel.org/pub/software/scm/git/git-1.7.4.4.tar.bz2'
-  md5 '1313f71d62fa100b32fa313769a85f2a'
->>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
   homepage 'http://git-scm.com'
+  url 'http://git-core.googlecode.com/files/git-1.8.2.tar.gz'
+  sha1 '42960ec7c2d8404af3d3f6d21f32f1e97e6e0a96'
+
+  head 'https://github.com/git/git.git'
+
+  option 'with-blk-sha1', 'Compile with the block-optimized SHA1 implementation'
+  option 'without-completions', 'Disable bash/zsh completions from "contrib" directory'
+
+  depends_on 'pcre' => :optional
 
   def install
-    # if these things are installed, tell git build system to not use them
-    ENV['NO_FINK']='1'
-    ENV['NO_DARWIN_PORTS']='1'
-    # If local::lib is used you get a 'Only one of PREFIX or INSTALL_BASE can be given' error
-    ENV['PERL_MM_OPT']=''
-    # build verbosely so we can debug better
-    ENV['V']='1'
+    # If these things are installed, tell Git build system to not use them
+    ENV['NO_FINK'] = '1'
+    ENV['NO_DARWIN_PORTS'] = '1'
+    ENV['V'] = '1' # build verbosely
+    ENV['NO_R_TO_GCC_LINKER'] = '1' # pass arguments to LD correctly
+    ENV['NO_GETTEXT'] = '1'
+    ENV['PERL_PATH'] = which 'perl' # workaround for users of perlbrew
+    ENV['PYTHON_PATH'] = which 'python' # python can be brewed or unbrewed
 
-    inreplace "Makefile" do |s|
-      s.remove_make_var! %w{CFLAGS LDFLAGS}
+    # Clean XCode 4.x installs don't include Perl MakeMaker
+    ENV['NO_PERL_MAKEMAKER'] = '1' if MacOS.version >= :lion
+
+    ENV['BLK_SHA1'] = '1' if build.with? 'blk-sha1'
+
+    if build.with? 'pcre'
+      ENV['USE_LIBPCRE'] = '1'
+      ENV['LIBPCREDIR'] = HOMEBREW_PREFIX
     end
 
-    system "make", "prefix=#{prefix}", "install"
+    system "make", "prefix=#{prefix}",
+                   "CC=#{ENV.cc}",
+                   "CFLAGS=#{ENV.cflags}",
+                   "LDFLAGS=#{ENV.ldflags}",
+                   "install"
 
-    # Install the git bash completion file.
-    # Put it into the Cellar so that it gets upgraded along with git upgrades.
-    (prefix+'etc/bash_completion.d').install 'contrib/completion/git-completion.bash'
-
-    # Install emacs support.
-    (share+'doc/git-core/contrib').install 'contrib/emacs'
-
-    # Install contrib files to share/contrib
-    (share).install 'contrib'
-
-    # these files are exact copies of the git binary, so like the contents
-    # of libexec/git-core lets hard link them
-    # I am assuming this is an overisght by the git devs
-    git_md5 = (bin+'git').md5
-    %w[git-receive-pack git-upload-archive].each do |fn|
-      fn = bin + fn
-      next unless git_md5 == fn.md5
-      fn.unlink
-      fn.make_link bin+'git'
+    # Install the OS X keychain credential helper
+    cd 'contrib/credential/osxkeychain' do
+      system "make", "CC=#{ENV.cc}",
+                     "CFLAGS=#{ENV.cflags}",
+                     "LDFLAGS=#{ENV.ldflags}"
+      bin.install 'git-credential-osxkeychain'
+      system "make", "clean"
     end
 
-    # we could build the manpages ourselves, but the build process depends
-    # on many other packages, and is somewhat crazy, this way is easier
+    # Install git-subtree
+    cd 'contrib/subtree' do
+      system "make", "CC=#{ENV.cc}",
+                     "CFLAGS=#{ENV.cflags}",
+                     "LDFLAGS=#{ENV.ldflags}"
+      bin.install 'git-subtree'
+    end
+
+    unless build.without? 'completions'
+      # install the completion script first because it is inside 'contrib'
+      bash_completion.install 'contrib/completion/git-completion.bash'
+      bash_completion.install 'contrib/completion/git-prompt.sh'
+
+      zsh_completion.install 'contrib/completion/git-completion.zsh' => '_git'
+      cp "#{bash_completion}/git-completion.bash", zsh_completion
+    end
+
+    (share+'git-core').install 'contrib'
+
+    # We could build the manpages ourselves, but the build process depends
+    # on many other packages, and is somewhat crazy, this way is easier.
     GitManuals.new.brew { man.install Dir['*'] }
     GitHtmldocs.new.brew { (share+'doc/git-doc').install Dir['*'] }
   end
 
   def caveats; <<-EOS.undent
-    Bash completion has been installed to:
-      #{prefix}/etc/bash_completion.d/
+    The OS X keychain credential helper has been installed to:
+      #{HOMEBREW_PREFIX}/bin/git-credential-osxkeychain
 
-    Emacs support has been installed to:
-      #{share}/doc/git-core/contrib/emacs/
-
-    The rest of the "contrib" has been installed to:
-      #{share}/contrib
+    The 'contrib' directory has been installed to:
+      #{HOMEBREW_PREFIX}/share/git-core/contrib
     EOS
+  end
+
+  test do
+    HOMEBREW_REPOSITORY.cd do
+      `#{bin}/git ls-files -- bin`.chomp == 'bin/brew'
+    end
   end
 end

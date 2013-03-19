@@ -1,31 +1,38 @@
 require 'formula'
 
 class Mutt < Formula
-  url 'ftp://ftp.mutt.org/mutt/devel/mutt-1.5.20.tar.gz'
   homepage 'http://www.mutt.org/'
-  md5 '027cdd9959203de0c3c64149a7ee351c'
+  url 'ftp://ftp.mutt.org/mutt/devel/mutt-1.5.21.tar.gz'
+  sha1 'a8475f2618ce5d5d33bff85c0affdf21ab1d76b9'
+
+  option "with-debug", "Build with debug option enabled"
+  option "with-sidebar-patch", "Apply sidebar (folder list) patch"
+  option "with-trash-patch", "Apply trash folder patch"
+  option "with-slang", "Build against slang instead of ncurses"
+  option "with-ignore-thread-patch", "Apply ignore-thread patch"
+  option "with-pgp-verbose-mime-patch", "Apply PGP verbose mime patch"
 
   depends_on 'tokyo-cabinet'
-
-  def options
-    [
-      ['--sidebar-patch', "Apply sidebar (folder list) patch"],
-      ['--enable-debug', "Build with debug option enabled"],
-      ['--trash-patch', "Apply trash folder patch"]
-    ]
-  end
+  depends_on 'slang' if build.include? 'with-slang'
 
   def patches
-    # Fix unsubscribe malformed folder
-    # See: http://dev.mutt.org/trac/ticket/3389
-    p = [ 'http://dev.mutt.org/hg/mutt/raw-rev/25e46aad362b' ]
+    urls = [
+      ['with-sidebar-patch', 'http://lunar-linux.org/~tchan/mutt/patch-1.5.21.sidebar.20120829.txt'],
+      ['with-trash-patch', 'http://patch-tracker.debian.org/patch/series/dl/mutt/1.5.21-6.2/features/trash-folder'],
+      ['with-ignore-thread-patch', 'http://ben.at.tanjero.com/patches/ignore-thread-1.5.21.patch'],
+      ['with-pgp-verbose-mime-patch',
+          'http://patch-tracker.debian.org/patch/series/dl/mutt/1.5.21-6.2/features-old/patch-1.5.4.vk.pgp_verbose_mime'],
+    ]
 
-    if ARGV.include? '--sidebar-patch'
-      p << 'http://lunar-linux.org/~tchan/mutt/patch-1.5.20.sidebar.20090619.txt'
+    if build.include? "with-ignore-thread-patch" and build.include? "with-sidebar-patch"
+      puts "\n"
+      onoe "The ignore-thread-patch and sidebar-patch options are mutually exlusive. Please pick one"
+      exit 1
     end
 
-    if ARGV.include? '--trash-patch'
-      p <<  'http://trac.macports.org/export/69644/trunk/dports/mail/mutt-devel/files/patch-1.5.20.bk.trash_folder-purge_message.1'
+    p = []
+    urls.each do |u|
+      p << u[1] if build.include? u[0]
     end
 
     return p
@@ -37,7 +44,6 @@ class Mutt < Formula
             "--prefix=#{prefix}",
             "--with-ssl",
             "--with-sasl",
-            "--with-gnutls",
             "--with-gss",
             "--enable-imap",
             "--enable-smtp",
@@ -47,10 +53,10 @@ class Mutt < Formula
             # This is just a trick to keep 'make install' from trying to chgrp
             # the mutt_dotlock file (which we can't do if we're running as an
             # unpriviledged user)
-            "--with-homespool=.mbox"
-      ]
+            "--with-homespool=.mbox"]
+    args << "--with-slang" if build.include? 'with-slang'
 
-    if ARGV.include? '--enable-debug'
+    if build.include? 'with-debug'
       args << "--enable-debug"
     else
       args << "--disable-debug"

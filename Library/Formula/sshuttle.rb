@@ -1,33 +1,17 @@
 require 'formula'
 
-<<<<<<< HEAD
-class Sshuttle <Formula
-<<<<<<< HEAD
-  url 'https://github.com/apenwarr/sshuttle/tarball/sshuttle-0.43'
-  homepage 'https://github.com/apenwarr/sshuttle'
-  md5 '590352aa7cbaad90c8f46dab64b829f4'
-  version '0.43'
-=======
-  url 'https://github.com/apenwarr/sshuttle/tarball/sshuttle-0.44'
-  homepage 'https://github.com/apenwarr/sshuttle'
-  md5 'c0d81604a8d864d0f52f2b6137b655a7'
-  version '0.44'
->>>>>>> 42bfd08ffc2d2799232afe062df0bbad16c59a0f
-=======
 class Sshuttle < Formula
-  url 'https://github.com/apenwarr/sshuttle/zipball/sshuttle-0.52'
   homepage 'https://github.com/apenwarr/sshuttle'
-  md5 '0f41d963be481d0d136d2b82180d6fcd'
-  version '0.52'
->>>>>>> 042169b16dfca2d3252bb0f727f07f25f4fb5695
+  url 'https://github.com/apenwarr/sshuttle/zipball/sshuttle-0.61'
+  sha1 '81ad1b98b2aed6fefdc8993a72392969a1a9be01'
 
-  head 'git://github.com/apenwarr/sshuttle.git'
+  head 'https://github.com/apenwarr/sshuttle.git'
 
   def install
+    # Building the docs requires installing
+    # markdown & BeautifulSoup Python modules
+    # so we don't.
     libexec.install Dir['*']
-    (bin+'sshuttle').write <<-EOS.undent
-      #!/bin/bash
-      exec #{libexec}/sshuttle "$@"
-    EOS
+    bin.write_exec_script libexec/'sshuttle'
   end
 end

@@ -2,19 +2,23 @@ require 'formula'
 
 class Groovy < Formula
   homepage 'http://groovy.codehaus.org/'
-  url 'http://dist.groovy.codehaus.org/distributions/groovy-binary-1.7.10.zip'
-  sha1 '1d869e4ebb822ba5c74d7b06a5c61b94bfc1538b'
+  url 'http://dist.groovy.codehaus.org/distributions/groovy-binary-2.1.1.zip'
+  sha1 '90a492ddcb58639a1b6aa2b2b500167ddb7cd388'
 
   def install
-    rm_f Dir["bin/*.bat"]
+    # Don't need Windows files.
+    # Why are icons in bin?
+    rm_f Dir["bin/*.bat","bin/groovy.{icns,ico}"]
 
-    prefix.install %w{ LICENSE.txt NOTICE.txt }
-    libexec.install %w[bin conf lib]
+    prefix.install_metafiles
+    libexec.install %w(bin conf lib embeddable)
+    bin.install_symlink Dir["#{libexec}/bin/*"]
+  end
 
-    bin.mkpath
-    Dir["#{libexec}/bin/*"].each do |f|
-      next unless File.extname(f).empty?
-      ln_s f, bin+File.basename(f)
-    end
+  def caveats
+    <<-EOS.undent
+      You should set the environment variable GROOVY_HOME to
+        #{libexec}
+    EOS
   end
 end

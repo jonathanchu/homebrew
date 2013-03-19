@@ -1,30 +1,37 @@
 require 'formula'
 
 class Pianobar < Formula
-  url 'https://github.com/PromyLOPh/pianobar/tarball/2011.04.10'
-  version '2011.04.10'
   homepage 'https://github.com/PromyLOPh/pianobar/'
-  md5 '813d3a9ee5dc23d6a68dd2a020096d06'
+  url 'https://github.com/PromyLOPh/pianobar/tarball/2012.12.01'
+  sha256 'bd460ef583d7c2799090ec2abc298bd0c8a7126110dac754f2c242ce95001955'
 
-  head 'git://github.com/PromyLOPh/pianobar.git'
+  head 'https://github.com/PromyLOPh/pianobar.git'
 
+  depends_on 'pkg-config' => :build
   depends_on 'libao'
   depends_on 'mad'
   depends_on 'faad2'
+  depends_on 'gnutls'
+  depends_on 'libgcrypt'
+  depends_on 'json-c'
 
-  skip_clean :bin
+  fails_with :llvm do
+    build 2334
+    cause "Reports of this not compiling on Xcode 4"
+  end
 
   def install
-    ENV.delete 'CFLAGS' # Pianobar uses c99 instead of gcc; remove our gcc flags.
+    # Discard Homebrew's CFLAGS as Pianobar reportedly doesn't like them
+    ENV['CFLAGS'] = "-O2 -DNDEBUG " +
+                    # Or it doesn't build at all
+                    "-std=c99 " +
+                    # build if we aren't /usr/local'
+                    "#{ENV["CPPFLAGS"]} #{ENV["LDFLAGS"]}"
 
-    # Enable 64-bit builds if needed
-    w_flag = MacOS.prefer_64_bit? ? "-W64" : ""
-    inreplace "Makefile" do |s|
-      s.gsub! "CFLAGS:=-O2 -DNDEBUG", "CFLAGS:=-O2 -DNDEBUG #{w_flag}"
-    end
     system "make", "PREFIX=#{prefix}"
     system "make", "install", "PREFIX=#{prefix}"
+
     # Install contrib folder too, why not.
-    prefix.install Dir['contrib']
+    prefix.install 'contrib'
   end
 end

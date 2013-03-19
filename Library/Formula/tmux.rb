@@ -1,53 +1,43 @@
 require 'formula'
 
 class Tmux < Formula
-  url 'http://downloads.sourceforge.net/tmux/tmux-1.4.tar.gz'
-  md5 '0bfc7dd9a5bab192406167589c716a21'
   homepage 'http://tmux.sourceforge.net'
+  url 'http://sourceforge.net/projects/tmux/files/tmux/tmux-1.7/tmux-1.7.tar.gz'
+  sha1 'ee6942a1bc3fc650036f26921d80bc4b73d56df6'
 
+  head 'git://tmux.git.sourceforge.net/gitroot/tmux/tmux'
+
+  depends_on 'pkg-config' => :build
   depends_on 'libevent'
 
-  def patches
-    # Patch originally from Macports ticket #18357
-    # Committed in Macports rev 58563
-    # https://trac.macports.org/changeset/58563
-    { :p1 => DATA }
+  if build.head?
+    depends_on :automake
+    depends_on :libtool
   end
 
   def install
-    ENV['PREFIX'] = prefix
-    system "./configure"
+    system "sh", "autogen.sh" if build.head?
 
-    inreplace "GNUmakefile" do |s|
-      # Put docs in the right place
-      s.gsub! "man/man1", "share/man/man1"
-    end
-
+    ENV.append "LDFLAGS", '-lresolv'
+    system "./configure", "--disable-dependency-tracking",
+                          "--prefix=#{prefix}",
+                          "--sysconfdir=#{etc}"
     system "make install"
+
+    (prefix+'etc/bash_completion.d').install "examples/bash_completion_tmux.sh" => 'tmux'
+
+    # Install addtional meta file
+    prefix.install 'NOTES'
+  end
+
+  def caveats; <<-EOS.undent
+    Additional information can be found in:
+      #{prefix}/NOTES
+    EOS
+  end
+
+  def test
+    system "#{bin}/tmux", "-V"
   end
 end
 
-__END__
-diff -Nur tmux-1.3/server.c tmux-1.3.new/server.c
---- tmux-1.3/server.c	2010-06-23 09:21:39.000000000 +1000
-+++ tmux-1.3.new/server.c	2010-11-29 08:48:48.000000000 +1100
-@@ -35,6 +35,8 @@
- #include <time.h>
- #include <unistd.h>
-
-+void *_vprocmgr_detach_from_console(unsigned int flags);
-+
- #include "tmux.h"
-
- /*
-@@ -137,8 +139,8 @@
-	 * Must daemonise before loading configuration as the PID changes so
-	 * $TMUX would be wrong for sessions created in the config file.
-	 */
--	if (daemon(1, 0) != 0)
--		fatal("daemon failed");
-+	if (_vprocmgr_detach_from_console(0) != NULL)
-+		fatalx("_vprocmgr_detach_from_console failed");
-
-	/* event_init() was called in our parent, need to reinit. */
-	if (event_reinit(ev_base) != 0)

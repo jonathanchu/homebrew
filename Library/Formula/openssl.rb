@@ -1,26 +1,35 @@
 require 'formula'
 
 class Openssl < Formula
-  url 'http://www.openssl.org/source/openssl-0.9.8o.tar.gz'
-  version '0.9.8o'
-  homepage 'http://www.openssl.org'
-  md5 '63ddc5116488985e820075e65fbe6aa4'
+  homepage 'http://openssl.org'
+  url 'http://openssl.org/source/openssl-1.0.1e.tar.gz'
+  sha256 'f74f15e8c8ff11aa3d5bb5f276d202ec18d7246e95f961db76054199c69c1ae3'
 
   keg_only :provided_by_osx,
-            "OpenSSL provided by Leopard is too old for newer software to link against."
-
-  def options
-    [["--universal", "Build a universal binary."]]
-  end
+    "The OpenSSL provided by OS X is too old for some software."
 
   def install
-    ENV.universal_binary if ARGV.build_universal?
-    ENV.j1 # Breaks on Mac Pro
-    system "./config", "--prefix=#{prefix}",
-                       "--openssldir=#{etc}",
-                       "zlib-dynamic", "shared"
+    args = %W[./Configure
+               --prefix=#{prefix}
+               --openssldir=#{etc}/openssl
+               zlib-dynamic
+               shared
+             ]
+
+    args << (MacOS.prefer_64_bit? ? "darwin64-x86_64-cc" : "darwin-i386-cc")
+
+    system "perl", *args
+
+    ENV.deparallelize # Parallel compilation fails
     system "make"
-    system "make test"
-    system "make install"
+    system "make", "test"
+    system "make", "install", "MANDIR=#{man}", "MANSUFFIX=ssl"
+  end
+
+  def caveats; <<-EOS.undent
+    To install updated CA certs from Mozilla.org:
+
+        brew install curl-ca-bundle
+    EOS
   end
 end
