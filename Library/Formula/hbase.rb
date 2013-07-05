@@ -2,8 +2,8 @@ require 'formula'
 
 class Hbase < Formula
   homepage 'http://hbase.apache.org'
-  url 'http://www.apache.org/dyn/closer.cgi?path=hbase/hbase-0.94.5/hbase-0.94.5.tar.gz'
-  sha1 '694faf309084b2e40ab6e9c3e336c50ce36cbb45'
+  url 'http://www.apache.org/dyn/closer.cgi?path=hbase/hbase-0.94.8/hbase-0.94.8.tar.gz'
+  sha1 '1319376422770a6f1ecd9a1a43854064c205aca5'
 
   depends_on 'hadoop'
 
